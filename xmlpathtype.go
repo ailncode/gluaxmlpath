@@ -37,7 +37,7 @@ func registerType(L *lua.LState, module *lua.LTable) {
 	itermt := L.NewTypeMetatable(luaIterTypeName)
 	L.SetField(module, "iter", itermt)
 	L.SetField(itermt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"next": next,
+		//"next": next,
 		"node": node,
 	}))
 }
@@ -97,7 +97,14 @@ func iter(L *lua.LState) int {
 		ut := L.CheckUserData(2)
 		if node, ok := ut.Value.(*Node); ok {
 			it := path.base.Iter(node.base)
-			L.Push(newIter(L, it))
+			ltab := L.NewTable()
+			i := 1
+			for it.Next() {
+				L.RawSetInt(ltab, i, newNode(L, it.Node()))
+				i++
+			}
+			L.Push(ltab)
+			//L.Push(newIter(L, it))
 			return 1
 		}
 	}
@@ -105,12 +112,13 @@ func iter(L *lua.LState) int {
 	return 0
 }
 
+//support lua standard iterator
 //hasNext := iter.next()
-func next(L *lua.LState) int {
-	iter := checkIter(L)
-	L.Push(lua.LBool(iter.base.Next()))
-	return 1
-}
+// func next(L *lua.LState) int {
+// 	iter := checkIter(L)
+// 	L.Push(lua.LBool(iter.base.Next()))
+// 	return 1
+// }
 
 //node := iter.node()
 func node(L *lua.LState) int {

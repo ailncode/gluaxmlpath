@@ -30,9 +30,8 @@ func main() {
         node,err = xmlpath.loadxml(xml)
         path,err = xmlpath.compile("//book")
         it = path:iter(node)
-        while(it:next())
-        do
-           print(it:node():string())
+        for k,v in pairs(it) do
+            print(k,v:string())
         end
     `); err != nil {
 		panic(err)
